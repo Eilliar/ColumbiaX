@@ -12,7 +12,7 @@ Notes:
     - Depth-First Search. Push onto the stack in reverse-UDLR order; popping off results in UDLR order.
 """
 
-import sys, ast, math
+import sys, ast, math, copy
 
 ######################################################
 # Classes
@@ -27,11 +27,19 @@ class State(object):
     def current(self):
         return self.currentState
 
-    def parent(self):
-        pass
+    def parent(self, state):
+        self.parent = state
 
     def children(self):
-        pass
+        child_list = []
+        moves = self.get_legal_moves()
+        zero = self.find(0)
+        for m in moves:
+            l = list(self.current())
+            l[zero+m], l[zero] = l[zero], l[zero+m]
+            child_list.append(l)
+
+        return child_list
 
     def get_legal_moves(self):
         moves = []
@@ -41,21 +49,24 @@ class State(object):
         zero = self.find(0)
         # if not in row 0: can go U (pos -n)
         if not(zero <= n-1):
-            moves.append("U")
+            moves.append(-n)
         # if not in row n-1: can go D (pos +n)
         if not(zero >= (n**2) - n):
-            moves.append("D")
+            moves.append(+n)
         # if not in col 0: can go L (pos -1)
         if not(zero%n == 0): 
-            moves.append("L")
+            moves.append(-1)
         # if not in col n-1: can go R (pos +1)
         if not((zero+1)%n == 0):
-            moves.append("R")
+            moves.append(+1)
 
-        return moves
+        return [int(x) for x in moves]
 
     def find(self, value):
-        return self.currentState.index(value)
+        return int(self.currentState.index(value))
+
+    def swap(self, z_index, move):
+        self.currentState[z_index+move], self.currentState[z_index] = self.currentState[z_index], self.currentState[z_index+move]
 
 class Queue(object):
     def __init__(self, state):
@@ -113,3 +124,5 @@ if __name__ == '__main__':
     print("Zero position: {}".format(state.find(0)))
 
     print("Available moves: {}".format(state.get_legal_moves()))
+
+    print("Children: {}".format(state.children()))
