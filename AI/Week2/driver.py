@@ -24,6 +24,9 @@ class State(object):
         self.dim = len(initialState)    # State Dimension
         self.parent = None
 
+    def __str__(self):
+        return "{}".format(self.currentState)
+
     def current(self):
         return self.currentState
 
@@ -37,7 +40,8 @@ class State(object):
         for m in moves:
             l = list(self.current())
             l[zero+m], l[zero] = l[zero], l[zero+m]
-            child_list.append(l)
+            #child_list.append(l)
+            child_list.append(State(l))
 
         return child_list
 
@@ -69,8 +73,23 @@ class State(object):
         self.currentState[z_index+move], self.currentState[z_index] = self.currentState[z_index], self.currentState[z_index+move]
 
 class Queue(object):
-    def __init__(self, state):
-        pass
+    def __init__(self):
+        self.items = []
+
+    def __str__(self):
+        return "{}".format(self.items)
+
+    def enqueue(self, item):
+        self.items.insert(0, item)
+
+    def dequeue(self):
+        return self.items.pop()
+
+    def isEmpty(self):
+        return self.items == []
+
+    def size(self):
+        return len(self.items)
 
 ######################################################
 # Functions
@@ -93,19 +112,22 @@ def Breadth_First_Search(initialState, goalTest):
     Outputs:
 
     """
-    frontier = Queue(initialState) # Queue.new(initialState)
-    explored = Set.new()
+    frontier = Queue() # Queue.new(initialState)
+    frontier.enqueue(initialState)
+    explored = set()
 
     while not frontier.isEmpty():
         state = frontier.dequeue()
         explored.add(state)
 
         if goalTest(state):
-            print("Success! Goal State: {}".format(state))
+            print("Success! Goal State: {}\nNumber of explored states: {}".format(state, len(explored)))
             return state
 
-        for neighbor in state.neighbors():
-            if (neighbor not in frontier) or (neighbor not in explored):
+        for neighbor in state.children():
+            test1 = neighbor.current() not in [x.current() for x in frontier.items]
+            test2 = neighbor.current() not in [x.current() for x in explored]
+            if (test1) and (test2):
                 frontier.enqueue(neighbor)
 
     return -1
