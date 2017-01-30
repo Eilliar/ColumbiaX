@@ -13,6 +13,7 @@ Notes:
 """
 
 import sys, ast, math, copy
+DEBUG = True
 
 ######################################################
 # Classes
@@ -103,7 +104,7 @@ def goalTest(state):
     else:
         return False
     
-def Breadth_First_Search(initialState, goalTest):
+def Breadth_First_Search(initialState, goalTest, debug = False):
     """Use BFS to solve n-puzzle
 
     Inputs:
@@ -121,7 +122,8 @@ def Breadth_First_Search(initialState, goalTest):
         explored.add(state)
 
         if goalTest(state):
-            print("Success! Goal State: {}\nNumber of explored states: {}".format(state, len(explored)))
+            if debug:
+                print("Success! Goal State: {}\nNumber of explored states: {}".format(state, len(explored)))
             return state
 
         for neighbor in state.children():
@@ -132,6 +134,18 @@ def Breadth_First_Search(initialState, goalTest):
 
     return -1
 
+def solve_puzzle(solver, initialState):
+    """"""
+    if (solver == 'bfs'):
+        Breadth_First_Search(initialState, goalTest, DEBUG)
+    elif (solver == 'dfs'):
+        return "Sorry"
+    elif (solver == 'ast'):
+        return "Sorry"
+    elif (solver == 'ida'):
+        return "Sorry"
+    else:
+        return "Wring method, choose between bsf, dfs, ast or ida solvers"
 
 if __name__ == '__main__':
     # Get input parameters
@@ -139,12 +153,6 @@ if __name__ == '__main__':
     solver = arg_list[1]
     initial_board = list(ast.literal_eval(arg_list[2]))
     print("Method: {}\tBoard Initial State: {}".format(solver, initial_board))
-
+    # Solve it
     state = State(initial_board)
-    print("Is the initial state the goal state? {}".format(goalTest(state)))
-
-    print("Zero position: {}".format(state.find(0)))
-
-    print("Available moves: {}".format(state.get_legal_moves()))
-
-    print("Children: {}".format(state.children()))
+    solve_puzzle(solver, state)
